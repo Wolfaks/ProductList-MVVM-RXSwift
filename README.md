@@ -1,4 +1,4 @@
-# ProductList - MVC
+# ProductList - MVVM
 
 List:
 
