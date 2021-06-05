@@ -21,50 +21,7 @@ class DetailViewController: UIViewController {
     @IBOutlet weak var cartCountView: CartCount!
 
     // viewModel
-    var viewModel: DetailViewModelProtocol! {
-        didSet {
-
-            guard let viewModel = viewModel else { return }
-
-            // Скрываем анимацию загрузки
-            loadIndicator.stopAnimating()
-
-            // Задаем обновленный заголовок страницы
-            title = viewModel.title
-
-            // Выводим информацию
-            titleLabel.text = viewModel.title
-            producerLabel.text = viewModel.producer
-            priceLabel.text = viewModel.price
-
-            // Описание
-            changeDescription(text: viewModel.shortDescription)
-
-            // Загрузка изображения, если ссылка пуста, то выводится изображение по умолчанию
-            image.image = UIImage(named: "nophoto")
-            if !viewModel.imageUrl.isEmpty {
-
-                // Загрузка изображения
-                guard let imageURL = URL(string: viewModel.imageUrl) else { return }
-                ImageNetworking.networking.getImage(link: imageURL) { (img) in
-                    DispatchQueue.main.async {
-                        self.image.image = img
-                    }
-                }
-
-            }
-
-            // Вывод корзины и кол-ва добавленых в корзину
-            setCartButtons()
-
-            // Оббновляем таблицу
-            tableView.reloadData()
-
-            // Отображаем данные
-            infoStackView.isHidden = false
-
-        }
-    }
+    var viewModel: DetailViewModelProtocol!
 
     static func storyboardInstance() -> DetailViewController? {
         // Для перехода на эту страницу
@@ -89,7 +46,52 @@ class DetailViewController: UIViewController {
         tableView.dataSource = self
         
         // Запрос данных
-        loadProduct()
+        // viewModel
+        if let id = productID {
+            viewModel = DetailViewModel(productID: id, amount: productSelectedAmount)
+            viewModel.bindToController = { [weak self] in
+
+                // Скрываем анимацию загрузки
+                self?.loadIndicator.stopAnimating()
+
+                // Задаем обновленный заголовок страницы
+                self?.title = self?.viewModel.title
+
+                // Выводим информацию
+                self?.titleLabel.text = self?.viewModel.title
+                self?.producerLabel.text = self?.viewModel.producer
+                self?.priceLabel.text = self?.viewModel.price
+
+                // Описание
+                self?.changeDescription(text: self?.viewModel.shortDescription ?? "")
+
+                // Загрузка изображения, если ссылка пуста, то выводится изображение по умолчанию
+                self?.image.image = UIImage(named: "nophoto")
+                if !(self?.viewModel.imageUrl.isEmpty ?? false) {
+
+                    // Загрузка изображения
+                    guard let imageURL = URL(string: (self?.viewModel.imageUrl)!) else {
+                        return
+                    }
+                    ImageNetworking.networking.getImage(link: imageURL) { (img) in
+                        DispatchQueue.main.async {
+                            self?.image.image = img
+                        }
+                    }
+
+                }
+
+                // Вывод корзины и кол-ва добавленых в корзину
+                self?.setCartButtons()
+
+                // Оббновляем таблицу
+                self?.tableView.reloadData()
+
+                // Отображаем данные
+                self?.infoStackView.isHidden = false
+
+            }
+        }
         
     }
     
@@ -128,24 +130,6 @@ class DetailViewController: UIViewController {
         } else {
             descriptionLabel.isHidden = false
             descriptionLabel.text = text
-        }
-        
-    }
-    
-    func loadProduct() {
-        
-        // Отправляем запрос загрузки товара
-        guard let productID = productID else { return }
-        ProductNetworking.getOneProduct(id: productID) { [weak self] (response) in
-  
-            // Проверяем что данные были успешно обработаны
-            if let product = response.product {
-
-                // viewModel
-                self?.viewModel = DetailViewModel(product: product, amount: self?.productSelectedAmount ?? 0)
-                
-            }
-            
         }
         
     }

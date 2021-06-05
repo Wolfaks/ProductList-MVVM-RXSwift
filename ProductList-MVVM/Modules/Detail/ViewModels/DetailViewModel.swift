@@ -3,25 +3,50 @@ import UIKit
 
 class DetailViewModel: DetailViewModelProtocol {
 
-    var title: String
-    var producer: String
-    var shortDescription: String
-    var imageUrl: String
-    var price: String
-    var categoryList: [Category]
-    var selectedAmount: Int
+    let id: Int
 
-    init(product: Product, amount: Int) {
-        title = product.title
-        producer = product.producer
-        shortDescription = product.shortDescription
-        imageUrl = product.imageUrl
+    var title: String = ""
+    var producer: String = ""
+    var shortDescription: String = ""
+    var imageUrl: String = ""
+    var price: String = ""
+    var categoryList: [Category] = []
+    var selectedAmount: Int = 0
 
-        // Убираем лишние нули после запятой, если они есть и выводим цену
-        price = String(format: "%g", product.price) + " ₽"
+    var bindToController : () -> () = {}
 
-        categoryList = product.categories
+    init(productID: Int, amount: Int) {
+        id = productID
         selectedAmount = amount
+        loadProduct()
+    }
+
+    func loadProduct() {
+
+        // Отправляем запрос загрузки товара
+        ProductNetworking.getOneProduct(id: id) { [weak self] (response) in
+
+            // Проверяем что данные были успешно обработаны
+            if let product = response.product {
+
+                self?.title = product.title
+                self?.producer = product.producer
+                self?.shortDescription = product.shortDescription
+                self?.imageUrl = product.imageUrl
+
+                // Убираем лишние нули после запятой, если они есть и выводим цену
+                self?.price = String(format: "%g", product.price) + " ₽"
+
+                // categories
+                self?.categoryList = product.categories
+
+                // Обновляем данные в контроллере
+                self?.bindToController()
+
+            }
+
+        }
+
     }
 
     func numberOfRows() -> Int {
