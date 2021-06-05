@@ -8,7 +8,7 @@ class ListViewController: UIViewController {
     @IBOutlet weak var loadIndicator: UIActivityIndicatorView!
 
     // viewModel
-    var viewModel: ListViewModelProtocol?
+    var viewModel: ListViewModelProtocol!
 
     // Поиск
     var searchText = ""
@@ -16,7 +16,6 @@ class ListViewController: UIViewController {
 
     // Страницы
     var page = 1
-    var haveNextPage = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,9 +23,6 @@ class ListViewController: UIViewController {
     }
     
     private func settingUI() {
-
-        // viewModel
-        viewModel = ListViewModel()
 
         // searchForm
         searchForm.delegate = self
@@ -42,9 +38,20 @@ class ListViewController: UIViewController {
 
         // Наблюдатель перехода в детальную информацию
         NotificationCenter.default.addObserver(self, selector: #selector(showDetail), name: Notification.Name(rawValue: "notificationRedirectToDetail"), object: nil)
-        
-        // Запрос данных
-        loadProducts()
+
+        // viewModel
+        viewModel = ListViewModel(page: page, searchText: searchText)
+        viewModel.bindToController = { [weak self] in
+
+            // Скрываем анимацию загрузки
+            if self?.page == 1 {
+                self?.loadIndicator.stopAnimating()
+            }
+
+            // Обновляем таблицу
+            self?.tableView.reloadData()
+
+        }
         
     }
 
@@ -96,13 +103,15 @@ class ListViewController: UIViewController {
     
     @objc func delayedSearch() {
 
+        guard viewModel != nil else { return }
+
         // Выполняем поиск
 
         // Задаем первую страницу
         page = 1
 
         // Запрос данных
-        loadProducts()
+        viewModel.loadProducts(page: page, searchText: searchText)
 
     }
     
@@ -143,39 +152,6 @@ class ListViewController: UIViewController {
         
     }
     
-    func loadProducts() {
-        
-        // Отправляем запрос загрузки товаров
-        ProductNetworking.getProducts(page: page, searchText: searchText) { [weak self] (response) in
-            
-            // Скрываем анимацию загрузки
-            if self?.page == 1 {
-                self?.loadIndicator.stopAnimating()
-            }
-
-            // Обрабатываем полученные товары
-            var products = response.products
-
-            // Так как API не позвращает отдельный ключ, который говорит о том, что есть следующая страница, определяем это вручную
-            if !products.isEmpty && products.count == ProductNetworking.maxProductsOnPage {
-
-                // Задаем наличие следующей страницы
-                self?.haveNextPage = true
-
-                // Удаляем последний элемент, который используется только для проверки на наличие следующей страницы
-                products.remove(at: products.count - 1)
-
-            }
-
-            // Устанавливаем загруженные товары и обновляем таблицу
-            // append contentsOf так как у нас метод грузит как первую страницу, так и последующие
-            self?.viewModel?.appendProducts(products: products)
-            self?.tableView.reloadData()
-            
-        }
-        
-    }
-    
 }
 
 extension ListViewController: UITableViewDataSource {
@@ -202,14 +178,14 @@ extension ListViewController: UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         // Проверяем что оторазили последний элемент и если есть, отображаем следующую страницу
-        if let viewModel = viewModel, !viewModel.productList.isEmpty && indexPath.row == (viewModel.productList.count - 1) && haveNextPage {
+        if viewModel != nil, !viewModel.productList.isEmpty && indexPath.row == (viewModel.productList.count - 1) && viewModel.haveNextPage {
 
             // Задаем новую страницу
-            haveNextPage = false
+            viewModel.haveNextPage = false
             page += 1
 
             // Запрос данных
-            loadProducts()
+            viewModel.loadProducts(page: page, searchText: searchText)
 
         }
     }
