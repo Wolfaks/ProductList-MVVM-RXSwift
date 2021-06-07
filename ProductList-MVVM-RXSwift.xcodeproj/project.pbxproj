@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -22,6 +22,7 @@
 		58C7ACFCABA9A63D882FC95C /* ListCellViewModalProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C7A649381F95437AB11DF9 /* ListCellViewModalProtocol.swift */; };
 		58C7AD1AC57057DFBB09E796 /* DetailCellViewModalProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C7A6FC16948CC0306AA5F5 /* DetailCellViewModalProtocol.swift */; };
 		58C7ADE823FBB1A438A8317A /* ListViewModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C7AD57EFC2A24C96864008 /* ListViewModelProtocol.swift */; };
+		A9380E7A9DAFEDA1EEDA423D /* Pods_ProductList_MVVM_RXSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E33ED228FA48A9A18C05A679 /* Pods_ProductList_MVVM_RXSwift.framework */; };
 		AC101F382652DA0700229855 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC101F372652DA0700229855 /* AppDelegate.swift */; };
 		AC101F3A2652DA0700229855 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC101F392652DA0700229855 /* SceneDelegate.swift */; };
 		AC101F422652DA0700229855 /* ItemListTest.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AC101F402652DA0700229855 /* ItemListTest.xcdatamodeld */; };
@@ -58,7 +59,9 @@
 		58C7AC67ABD69382F52B1C43 /* CategoryResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryResponse.swift; sourceTree = "<group>"; };
 		58C7AD57EFC2A24C96864008 /* ListViewModelProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListViewModelProtocol.swift; sourceTree = "<group>"; };
 		58C7AFBC75CDE3C83964BE9B /* ListViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListViewModel.swift; sourceTree = "<group>"; };
-		AC101F342652DA0700229855 /* ProductList-MVVM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ProductList-MVVM.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7FDA2C8452F746C23C969DD3 /* Pods-ProductList-MVVM-RXSwift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProductList-MVVM-RXSwift.debug.xcconfig"; path = "Target Support Files/Pods-ProductList-MVVM-RXSwift/Pods-ProductList-MVVM-RXSwift.debug.xcconfig"; sourceTree = "<group>"; };
+		9A08E62580FF937FC7B85FDE /* Pods-ProductList-MVVM-RXSwift.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProductList-MVVM-RXSwift.release.xcconfig"; path = "Target Support Files/Pods-ProductList-MVVM-RXSwift/Pods-ProductList-MVVM-RXSwift.release.xcconfig"; sourceTree = "<group>"; };
+		AC101F342652DA0700229855 /* ProductList-MVVM-RXSwift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ProductList-MVVM-RXSwift.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC101F372652DA0700229855 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AC101F392652DA0700229855 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		AC101F412652DA0700229855 /* ItemListTest.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ItemListTest.xcdatamodel; sourceTree = "<group>"; };
@@ -74,10 +77,14 @@
 		AC5865E82656A52600A14876 /* ImageNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageNetworking.swift; sourceTree = "<group>"; };
 		AC85D4AB2653FDFD0017B5AC /* ProductNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductNetworking.swift; sourceTree = "<group>"; };
 		AC85D4AF265430140017B5AC /* Category.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
+		ACA9B1A3266E25270009B9C7 /* RxCocoa.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RxCocoa.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		ACA9B1A7266E252E0009B9C7 /* RxRelay.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RxRelay.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		ACA9B1AA266E25380009B9C7 /* RxSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RxSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACC026FD2657A77C00021DAC /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		ACFCF5512653A70700A46D40 /* ProductListTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductListTableCell.swift; sourceTree = "<group>"; };
 		ACFCF5582653CCC900A46D40 /* Networking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Networking.swift; sourceTree = "<group>"; };
 		ACFCF55B2653D4C900A46D40 /* ProductResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductResponse.swift; sourceTree = "<group>"; };
+		E33ED228FA48A9A18C05A679 /* Pods_ProductList_MVVM_RXSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ProductList_MVVM_RXSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,12 +92,33 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9380E7A9DAFEDA1EEDA423D /* Pods_ProductList_MVVM_RXSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		178420ACF03279D5005FC6A0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				ACA9B1AA266E25380009B9C7 /* RxSwift.framework */,
+				ACA9B1A7266E252E0009B9C7 /* RxRelay.framework */,
+				ACA9B1A3266E25270009B9C7 /* RxCocoa.framework */,
+				E33ED228FA48A9A18C05A679 /* Pods_ProductList_MVVM_RXSwift.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		57BA13DEE498F822678894C5 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				7FDA2C8452F746C23C969DD3 /* Pods-ProductList-MVVM-RXSwift.debug.xcconfig */,
+				9A08E62580FF937FC7B85FDE /* Pods-ProductList-MVVM-RXSwift.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		58C7A00632097A92D1A8BFBB /* Owners */ = {
 			isa = PBXGroup;
 			children = (
@@ -115,20 +143,22 @@
 		AC101F2B2652DA0700229855 = {
 			isa = PBXGroup;
 			children = (
-				AC101F362652DA0700229855 /* ProductList-MVVM */,
+				AC101F362652DA0700229855 /* ProductList-MVVM-RXSwift */,
 				AC101F352652DA0700229855 /* Products */,
+				57BA13DEE498F822678894C5 /* Pods */,
+				178420ACF03279D5005FC6A0 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
 		AC101F352652DA0700229855 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				AC101F342652DA0700229855 /* ProductList-MVVM.app */,
+				AC101F342652DA0700229855 /* ProductList-MVVM-RXSwift.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		AC101F362652DA0700229855 /* ProductList-MVVM */ = {
+		AC101F362652DA0700229855 /* ProductList-MVVM-RXSwift */ = {
 			isa = PBXGroup;
 			children = (
 				AC101F5B2652EEC000229855 /* Models */,
@@ -136,7 +166,7 @@
 				AC101F4E2652DA4800229855 /* Supporting files */,
 				ACFCF5532653A70A00A46D40 /* Components */,
 			);
-			path = "ProductList-MVVM";
+			path = "ProductList-MVVM-RXSwift";
 			sourceTree = "<group>";
 		};
 		AC101F4E2652DA4800229855 /* Supporting files */ = {
@@ -279,21 +309,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		AC101F332652DA0700229855 /* ProductList-MVVM */ = {
+		AC101F332652DA0700229855 /* ProductList-MVVM-RXSwift */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AC101F4B2652DA0800229855 /* Build configuration list for PBXNativeTarget "ProductList-MVVM" */;
+			buildConfigurationList = AC101F4B2652DA0800229855 /* Build configuration list for PBXNativeTarget "ProductList-MVVM-RXSwift" */;
 			buildPhases = (
+				6AA8DBC7E2D92BA8004B0772 /* [CP] Check Pods Manifest.lock */,
 				AC101F302652DA0700229855 /* Sources */,
 				AC101F312652DA0700229855 /* Frameworks */,
 				AC101F322652DA0700229855 /* Resources */,
+				52EA44FF332686F97BE171C6 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = "ProductList-MVVM";
+			name = "ProductList-MVVM-RXSwift";
 			productName = ItemListTest;
-			productReference = AC101F342652DA0700229855 /* ProductList-MVVM.app */;
+			productReference = AC101F342652DA0700229855 /* ProductList-MVVM-RXSwift.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -310,7 +342,7 @@
 					};
 				};
 			};
-			buildConfigurationList = AC101F2F2652DA0700229855 /* Build configuration list for PBXProject "ProductList-MVVM" */;
+			buildConfigurationList = AC101F2F2652DA0700229855 /* Build configuration list for PBXProject "ProductList-MVVM-RXSwift" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -323,7 +355,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				AC101F332652DA0700229855 /* ProductList-MVVM */,
+				AC101F332652DA0700229855 /* ProductList-MVVM-RXSwift */,
 			);
 		};
 /* End PBXProject section */
@@ -344,6 +376,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		52EA44FF332686F97BE171C6 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ProductList-MVVM-RXSwift/Pods-ProductList-MVVM-RXSwift-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ProductList-MVVM-RXSwift/Pods-ProductList-MVVM-RXSwift-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ProductList-MVVM-RXSwift/Pods-ProductList-MVVM-RXSwift-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6AA8DBC7E2D92BA8004B0772 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ProductList-MVVM-RXSwift-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		AC101F302652DA0700229855 /* Sources */ = {
@@ -511,12 +585,14 @@
 		};
 		AC101F4C2652DA0800229855 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7FDA2C8452F746C23C969DD3 /* Pods-ProductList-MVVM-RXSwift.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = KEYTJ8NN69;
-				INFOPLIST_FILE = "ProductList-MVVM/Supporting files/Info.plist";
+				INFOPLIST_FILE = "ProductList-MVVM-RXSwift/Supporting files/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -530,12 +606,14 @@
 		};
 		AC101F4D2652DA0800229855 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9A08E62580FF937FC7B85FDE /* Pods-ProductList-MVVM-RXSwift.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = KEYTJ8NN69;
-				INFOPLIST_FILE = "ProductList-MVVM/Supporting files/Info.plist";
+				INFOPLIST_FILE = "ProductList-MVVM-RXSwift/Supporting files/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -550,7 +628,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AC101F2F2652DA0700229855 /* Build configuration list for PBXProject "ProductList-MVVM" */ = {
+		AC101F2F2652DA0700229855 /* Build configuration list for PBXProject "ProductList-MVVM-RXSwift" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AC101F492652DA0800229855 /* Debug */,
@@ -559,7 +637,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AC101F4B2652DA0800229855 /* Build configuration list for PBXNativeTarget "ProductList-MVVM" */ = {
+		AC101F4B2652DA0800229855 /* Build configuration list for PBXNativeTarget "ProductList-MVVM-RXSwift" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AC101F4C2652DA0800229855 /* Debug */,
