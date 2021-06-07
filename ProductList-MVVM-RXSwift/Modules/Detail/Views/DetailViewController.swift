@@ -1,5 +1,7 @@
 
 import UIKit
+import RxCocoa
+import RxSwift
 
 class DetailViewController: UIViewController {
     
@@ -23,6 +25,8 @@ class DetailViewController: UIViewController {
     // viewModel
     var viewModel: DetailViewModelProtocol!
 
+    let DBag = DisposeBag()
+
     static func storyboardInstance() -> DetailViewController? {
         // Для перехода на эту страницу
         let storyboard = UIStoryboard(name: "Detail", bundle: nil)
@@ -41,10 +45,6 @@ class DetailViewController: UIViewController {
             title = productTitle
         }
         
-        // TableView
-        tableView.delegate = self
-        tableView.dataSource = self
-        
         // Запрос данных
         // viewModel
         if let id = productID {
@@ -61,25 +61,10 @@ class DetailViewController: UIViewController {
                 self?.titleLabel.text = self?.viewModel.title
                 self?.producerLabel.text = self?.viewModel.producer
                 self?.priceLabel.text = self?.viewModel.price
+                self?.image.image = self?.viewModel.image
 
                 // Описание
                 self?.changeDescription(text: self?.viewModel.shortDescription ?? "")
-
-                // Загрузка изображения, если ссылка пуста, то выводится изображение по умолчанию
-                self?.image.image = UIImage(named: "nophoto")
-                if !(self?.viewModel.imageUrl.isEmpty ?? false) {
-
-                    // Загрузка изображения
-                    guard let imageURL = URL(string: (self?.viewModel.imageUrl)!) else {
-                        return
-                    }
-                    ImageNetworking.networking.getImage(link: imageURL) { (img) in
-                        DispatchQueue.main.async {
-                            self?.image.image = img
-                        }
-                    }
-
-                }
 
                 // Вывод корзины и кол-ва добавленых в корзину
                 self?.setCartButtons()
@@ -91,8 +76,27 @@ class DetailViewController: UIViewController {
                 self?.infoStackView.isHidden = false
 
             }
+
+            // tableView
+            settingTableView()
+
         }
         
+    }
+
+    private func settingTableView() {
+
+        // tableView
+        tableView.rowHeight = 32.0
+
+        // Вывод данных
+        viewModel.categoryList.bind(to: tableView.rx.items(cellIdentifier: "categoryCell", cellType: CategoryListTableCell.self)) {
+            (row, item, cell) in
+
+            let cellViewModel = self.viewModel.cellViewModel(index: row)
+            cell.viewModel = cellViewModel
+
+        }.disposed(by: DBag)
     }
     
     func setCartButtons() {
@@ -136,33 +140,6 @@ class DetailViewController: UIViewController {
     
 }
 
-extension DetailViewController: UITableViewDataSource {
-
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        viewModel?.numberOfRows() ?? 0
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell", for: indexPath) as? CategoryListTableCell, let viewModel = viewModel else { return UITableViewCell() }
-
-        let cellViewModel = viewModel.cellViewModel(forIndexPath: indexPath)
-        cell.viewModel = cellViewModel
-
-        return cell
-
-    }
-
-}
-
-extension DetailViewController: UITableViewDelegate {
-
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        32.0
-    }
-
-}
-
 extension DetailViewController: CartCountDelegate {
     
     func changeCount(value: Int) {
@@ -171,11 +148,8 @@ extension DetailViewController: CartCountDelegate {
         guard let productIndex = productIndex, viewModel != nil else { return }
         
         // Обновляем кнопку в отображении
-        viewModel.selectedAmount = value
+        viewModel.changeCartCount(index: productIndex, count: value)
         setCartButtons()
-        
-        // Обновляем значение в корзине в списке через наблюдатель
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "notificationUpdateCartCount"), object: nil, userInfo: ["index": productIndex, "count": value])
         
     }
     
@@ -191,11 +165,8 @@ extension DetailViewController: CartBtnDetailDelegate {
         let addCartCount = 1
         
         // Обновляем кнопку в отображении
-        viewModel.selectedAmount = addCartCount
+        viewModel.changeCartCount(index: productIndex, count: addCartCount)
         setCartButtons()
-
-        // Обновляем значение в корзине в списке через наблюдатель
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "notificationUpdateCartCount"), object: nil, userInfo: ["index": productIndex, "count": addCartCount])
         
     }
     

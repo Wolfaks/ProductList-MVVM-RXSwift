@@ -133,6 +133,7 @@ class ListViewModel: ListViewModelProtocol {
     }
 
     func updateCartCount(index: Int, value: Int) {
+        guard !productListArr.isEmpty && productListArr.indices.contains(index) else { return }
         productListArr[index].selectedAmount = value
         updateProducts()
     }

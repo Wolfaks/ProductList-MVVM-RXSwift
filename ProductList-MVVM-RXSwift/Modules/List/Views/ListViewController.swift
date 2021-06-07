@@ -91,7 +91,7 @@ class ListViewController: UIViewController {
     @objc func updateCartCount(notification: Notification) {
 
         // Изменяем кол-во товара в корзине
-        guard let userInfo = notification.userInfo, let index = userInfo["index"] as? Int, let newCount = userInfo["count"] as? Int, let viewModel = viewModel, !viewModel.productListArr.isEmpty && viewModel.productListArr.indices.contains(index) else { return }
+        guard let userInfo = notification.userInfo, let index = userInfo["index"] as? Int, let newCount = userInfo["count"] as? Int, let viewModel = viewModel else { return }
 
         // Записываем новое значение
         viewModel.updateCartCount(index: index, value: newCount)
