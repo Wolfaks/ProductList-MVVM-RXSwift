@@ -7,7 +7,7 @@ class ListViewModel: ListViewModelProtocol {
 
     var productList: BehaviorRelay<[Product]>
     var productListArr = [Product]()
-    var searchText = BehaviorRelay(value: "")
+    var searchText: BehaviorRelay<String>
     var showLoadIndicator: () -> () = {}
     var hideLoadIndicator: () -> () = {}
     let DBag = DisposeBag()
@@ -22,6 +22,7 @@ class ListViewModel: ListViewModelProtocol {
 
     init() {
         productList = BehaviorRelay<[Product]>(value: [])
+        searchText = BehaviorRelay<String>(value: "")
         searchObservable()
         loadProducts()
     }
