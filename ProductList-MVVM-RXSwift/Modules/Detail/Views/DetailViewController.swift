@@ -69,9 +69,6 @@ class DetailViewController: UIViewController {
                 // Вывод корзины и кол-ва добавленых в корзину
                 self?.setCartButtons()
 
-                // Оббновляем таблицу
-                self?.tableView.reloadData()
-
                 // Отображаем данные
                 self?.infoStackView.isHidden = false
 
