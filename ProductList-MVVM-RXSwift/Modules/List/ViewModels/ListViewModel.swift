@@ -14,7 +14,7 @@ class ListViewModel: ListViewModelProtocol {
 
     // Поиск
     var searchString = ""
-    var searchTimer = Timer()
+    private let searchOperationQueue = OperationQueue()
 
     // Страницы
     var page: Int = 1
@@ -25,18 +25,6 @@ class ListViewModel: ListViewModelProtocol {
         searchText = BehaviorRelay<String>(value: "")
         searchObservable()
         loadProducts()
-    }
-
-    @objc func delayedSearch() {
-
-        // Выполняем поиск
-
-        // Задаем первую страницу
-        page = 1
-
-        // Запрос данных
-        loadProducts()
-
     }
 
     func searchObservable() {
@@ -62,11 +50,27 @@ class ListViewModel: ListViewModelProtocol {
                     // Отображаем анимацию загрузки
                     self?.showLoadIndicator()
 
-                    // Отменяем предыдущий таймер поиска
-                    self?.searchTimer.invalidate()
+                    // Поиск с задержкой (по ТЗ)
+                    let operationSearch = BlockOperation()
+                    operationSearch.addExecutionBlock { [weak operationSearch] in
 
-                    // Таймер задержки поиска (по ТЗ)
-                    self?.searchTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(self?.delayedSearch), userInfo: nil, repeats: false)
+                        // Задержка (по ТЗ)
+                        sleep(2)
+
+                        if !(operationSearch?.isCancelled ?? false) {
+
+                            // Выполняем поиск
+                            // Задаем первую страницу
+                            self?.page = 1
+
+                            // Запрос данных
+                            self?.loadProducts()
+
+                        }
+
+                    }
+                    self?.searchOperationQueue.cancelAllOperations()
+                    self?.searchOperationQueue.addOperation(operationSearch)
 
                 }.disposed(by: DBag)
     }
