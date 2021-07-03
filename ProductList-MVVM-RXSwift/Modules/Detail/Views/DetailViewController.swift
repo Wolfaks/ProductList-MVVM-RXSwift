@@ -36,6 +36,7 @@ class DetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         settingUI()
+        setupBindings()
     }
     
     private func settingUI() {
@@ -75,16 +76,21 @@ class DetailViewController: UIViewController {
             }
 
             // tableView
-            settingTableView()
+            tableView.rowHeight = 32.0
 
         }
         
     }
 
-    private func settingTableView() {
+    private func setupBindings() {
+        bindViewToViewModel()
+        bindViewModelToView()
+    }
 
-        // tableView
-        tableView.rowHeight = 32.0
+    private func bindViewToViewModel() {
+    }
+
+    private func bindViewModelToView() {
 
         // Вывод данных
         viewModel.categoryList.bind(to: tableView.rx.items(cellIdentifier: "categoryCell", cellType: CategoryListTableCell.self)) {
@@ -94,6 +100,7 @@ class DetailViewController: UIViewController {
             cell.viewModel = cellViewModel
 
         }.disposed(by: DBag)
+
     }
     
     func setCartButtons() {

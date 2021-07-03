@@ -16,6 +16,7 @@ class ListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         settingUI()
+        setupBindings()
     }
     
     private func settingUI() {
@@ -38,16 +39,32 @@ class ListViewController: UIViewController {
         }
 
         // tableView
-        settingTableView()
+        tableView.rowHeight = 160.0
 
         // search
-        settingSearch()
+        // Кнопка done
+        searchForm.delegate = self
         
     }
-    private func settingTableView() {
 
-        // tableView
-        tableView.rowHeight = 160.0
+    private func setupBindings() {
+        bindViewToViewModel()
+        bindViewModelToView()
+    }
+
+    private func bindViewToViewModel() {
+
+        // Связываем TextField с поисков в ListViewModel
+        searchForm.rx.text
+                .orEmpty
+                .throttle(.milliseconds(1000), scheduler: MainScheduler.instance)
+                .distinctUntilChanged()
+                .do(onNext: nil)
+                .bind(to: viewModel.searchText).disposed(by: DBag)
+
+    }
+
+    private func bindViewModelToView() {
 
         // Вывод данных
         viewModel.productList.bind(to: tableView.rx.items(cellIdentifier: "productCell", cellType: ProductListTableCell.self)) {
@@ -70,21 +87,6 @@ class ListViewController: UIViewController {
                     self?.viewModel.visibleCell(Index: indexPath.row)
 
                 }.disposed(by: DBag)
-
-    }
-
-    private func settingSearch() {
-
-        // Кнопка done
-        searchForm.delegate = self
-
-        // Связываем TextField с поисков в ListViewModel
-        searchForm.rx.text
-                .orEmpty
-                .throttle(.milliseconds(600), scheduler: MainScheduler.instance)
-                .distinctUntilChanged()
-                .do(onNext: nil)
-                .bind(to: viewModel.searchText).disposed(by: DBag)
 
     }
 

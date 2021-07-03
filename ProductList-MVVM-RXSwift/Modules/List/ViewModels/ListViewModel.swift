@@ -13,7 +13,6 @@ class ListViewModel: ListViewModelProtocol {
     let DBag = DisposeBag()
 
     // Поиск
-    var searchString = ""
     private let searchOperationQueue = OperationQueue()
 
     // Страницы
@@ -23,11 +22,12 @@ class ListViewModel: ListViewModelProtocol {
     init() {
         productList = BehaviorRelay<[Product]>(value: [])
         searchText = BehaviorRelay<String>(value: "")
-        searchObservable()
+        setupBindings()
         loadProducts()
     }
 
-    func searchObservable() {
+    private func setupBindings() {
+
         // Наблюдаем за изменениями в форме поиска
         searchText
                 .asObservable()
@@ -36,26 +36,15 @@ class ListViewModel: ListViewModelProtocol {
                     // Проверяем измененный в форме текст
                     guard let searchString = search.element else { return }
 
-                    // Выполняем поиск когда форма была изменена
-                    if searchString.hash == self?.searchString.hash {
-                        return
-                    }
-
-                    // Получаем искомую строку
-                    self?.searchString = searchString
-
                     // Очищаем старые данные и обновляем таблицу
                     self?.removeAllProducts()
 
                     // Отображаем анимацию загрузки
                     self?.showLoadIndicator()
 
-                    // Поиск с задержкой (по ТЗ)
+                    // Поиск
                     let operationSearch = BlockOperation()
                     operationSearch.addExecutionBlock { [weak operationSearch] in
-
-                        // Задержка (по ТЗ)
-                        sleep(2)
 
                         if !(operationSearch?.isCancelled ?? false) {
 
@@ -73,6 +62,7 @@ class ListViewModel: ListViewModelProtocol {
                     self?.searchOperationQueue.addOperation(operationSearch)
 
                 }.disposed(by: DBag)
+
     }
 
     func loadProducts() {
