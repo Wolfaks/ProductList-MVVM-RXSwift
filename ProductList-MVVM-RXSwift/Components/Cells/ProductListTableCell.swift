@@ -1,5 +1,6 @@
 
 import UIKit
+import RxSwift
 
 class ProductListTableCell: UITableViewCell {
     
@@ -12,6 +13,8 @@ class ProductListTableCell: UITableViewCell {
     @IBOutlet weak var productPrice: UILabel!
     @IBOutlet weak var stackFooterCell: UIStackView!
 
+    let DBag = DisposeBag()
+    
     let cartBtnListView: CartBtnList = {
         let btnList = CartBtnList()
         btnList.translatesAutoresizingMaskIntoConstraints = false
@@ -56,6 +59,9 @@ class ProductListTableCell: UITableViewCell {
 
             // Вывод корзины и кол-ва добавленых в корзину
             setCartButtons(viewModel: viewModel)
+            
+            // bind - Клик на добавление в карзину
+            setupBindings()
 
             // Действия при клике
             setClicable()
@@ -65,6 +71,38 @@ class ProductListTableCell: UITableViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
+    }
+    
+    private func setupBindings() {
+        
+        // bind - Клик на добавление в карзину
+        let tapCartBtnGesture = UITapGestureRecognizer()
+        cartBtnListView.addGestureRecognizer(tapCartBtnGesture)
+        tapCartBtnGesture.rx
+                .event
+                .subscribe { [weak self] recognizer in
+                    
+                    // Добавляем товар в карзину
+                    guard let productIndex = self?.productIndex else { return }
+
+                    // Обновляем значение в корзине в списке через наблюдатель
+                    NotificationCenter.default.post(name: Notification.Name(rawValue: "notificationUpdateCartCount"), object: nil, userInfo: ["index": productIndex, "count": 1])
+                    
+                }.disposed(by: DBag)
+        
+        // Изменение количества в корзине
+        cartCountView.countSubject.subscribe(onNext: { [weak self] value in
+            
+            // Изменяем значение количества в структуре
+            guard let productIndex = self?.productIndex else { return }
+
+            // Обновляем значение в корзине в списке через наблюдатель
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "notificationUpdateCartCount"), object: nil, userInfo: ["index": productIndex, "count": value])
+            
+        }, onError: { [weak self] error in
+            print(error)
+        }).disposed(by: DBag)
+        
     }
     
     func setBorder() {
@@ -91,9 +129,6 @@ class ProductListTableCell: UITableViewCell {
             // Задаем текущее значение счетчика
             cartCountView.count = viewModel.selectedAmount
 
-            // Подписываемся на делегат
-            cartCountView.delegate = self
-
             // Constraints
             cartCountView.widthAnchor.constraint(equalToConstant: CartCount.widthSize).isActive = true
             cartCountView.heightAnchor.constraint(equalToConstant: CartCount.heightSize).isActive = true
@@ -106,9 +141,6 @@ class ProductListTableCell: UITableViewCell {
 
             // Выводим кнопку добавления в корзину
             stackFooterCell.addArrangedSubview(cartBtnListView)
-
-            // Подписываемся на делегат
-            cartBtnListView.delegate = self
 
             // Constraints
             cartBtnListView.widthAnchor.constraint(equalToConstant: CartBtnList.widthSize).isActive = true
@@ -140,33 +172,6 @@ class ProductListTableCell: UITableViewCell {
         productTitle.isUserInteractionEnabled = true
         productTitle.addGestureRecognizer(tapTitleGesture)
         
-    }
-    
-}
-
-extension ProductListTableCell: CartCountDelegate {
-    
-    func changeCount(value: Int) {
-        // Изменяем значение количества в структуре
-        guard let productIndex = productIndex else { return }
-
-        // Обновляем значение в корзине в списке через наблюдатель
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "notificationUpdateCartCount"), object: nil, userInfo: ["index": productIndex, "count": value])
-
-    }
-    
-}
-
-extension ProductListTableCell: CartBtnListDelegate {
-    
-    func addCart() {
-
-        // Добавляем товар в карзину
-        guard let productIndex = productIndex else { return }
-
-        // Обновляем значение в корзине в списке через наблюдатель
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "notificationUpdateCartCount"), object: nil, userInfo: ["index": productIndex, "count": 1])
-
     }
     
 }

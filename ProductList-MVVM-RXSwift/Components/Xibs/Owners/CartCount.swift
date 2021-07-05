@@ -1,9 +1,6 @@
 
 import UIKit
-
-protocol CartCountDelegate: class {
-    func changeCount(value: Int)
-}
+import RxSwift
 
 @IBDesignable class CartCount: UIView {
 
@@ -15,8 +12,7 @@ protocol CartCountDelegate: class {
     @IBOutlet weak var plusBtn: UIButton!
     @IBOutlet weak var selectedAmount: UILabel!
     
-    weak var delegate: CartCountDelegate?
-    
+    var countSubject = PublishSubject<Int>()
     var count: Int = 0 {
         didSet {
             selectedAmount.text = "\(count)"
@@ -25,6 +21,8 @@ protocol CartCountDelegate: class {
     
     var view: UIView!
     var nibName: String = "CartCount"
+    
+    let DBag = DisposeBag()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -57,20 +55,34 @@ protocol CartCountDelegate: class {
         // Закругляем углы stackView
         radiusStackView.layer.cornerRadius = 5.0
         
+        // bind - Клик на кнопки количества товаров в корзине
+        setupBindings()
+        
     }
     
-    @IBAction func changeCountBtn(_ sender: UIButton) {
+    private func setupBindings() {
         
-        // Меняем значение в корзине нажатием на кнопку - / +
-        if sender == minusBtn {
-            // Нельзя задавать значение меньше нуля
-            count = max(0, count - 1)
-        } else if sender == plusBtn {
-            count += 1
-        }
+        // bind - Клик на кнопки количества товаров в корзине
         
-        // Изменяем значение количества в структуре
-        delegate?.changeCount(value: count)
+        // Нажали на кнопку минус
+        minusBtn.rx.tap
+                .subscribe { [weak self] tap in
+                    // Нельзя задавать значение меньше нуля
+                    self?.countSubject.onNext(max(0, (self?.count ?? 0) - 1))
+                }.disposed(by: DBag)
+        
+        // Нажали на кнопку плюс
+        plusBtn.rx.tap
+                .subscribe { [weak self] tap in
+                    self?.countSubject.onNext((self?.count ?? 0) + 1)
+                }.disposed(by: DBag)
+        
+        // Изменение количества в корзине
+        countSubject.subscribe(onNext: { [weak self] count in
+            self?.count = count
+        }, onError: { [weak self] error in
+            print(error)
+        }).disposed(by: DBag)
         
     }
     

@@ -29,14 +29,6 @@ class ListViewController: UIViewController {
 
         // viewModel
         viewModel = ListViewModel()
-        viewModel.showLoadIndicator = { [weak self] in
-            // Отображаем анимацию загрузки
-            self?.loadIndicator.startAnimating()
-        }
-        viewModel.hideLoadIndicator = { [weak self] in
-            // Скрываем анимацию загрузки
-            self?.loadIndicator.stopAnimating()
-        }
 
         // tableView
         tableView.rowHeight = 160.0
@@ -88,6 +80,21 @@ class ListViewController: UIViewController {
 
                 }.disposed(by: DBag)
 
+        // Анимация загрузки
+        viewModel.showLoadIndicator.subscribe(onNext: { [weak self] show in
+
+            if show {
+                // Отображаем анимацию загрузки
+                self?.loadIndicator.startAnimating()
+            } else {
+                // Скрываем анимацию загрузки
+                self?.loadIndicator.stopAnimating()
+            }
+
+        }, onError: { [weak self] error in
+            print(error)
+        }).disposed(by: DBag)
+
     }
 
     @objc func updateCartCount(notification: Notification) {
@@ -117,17 +124,17 @@ class ListViewController: UIViewController {
     }
     
     @IBAction func removeSearch(_ sender: Any) {
+        
+        // Очищаем форму поиска
+        searchForm.text = ""
 
         // Скрываем клавиатуру
         hideKeyboard()
         
-        // Очищаем форму поиска
-        searchForm.text = ""
-        
     }
     
     func hideKeyboard() {
-        view.endEditing(true);
+        view.endEditing(true)
     }
     
 }

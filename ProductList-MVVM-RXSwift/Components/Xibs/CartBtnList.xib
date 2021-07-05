@@ -8,9 +8,9 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CartBtnList" customModule="ProductList" customModuleProvider="target">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CartBtnList" customModule="ProductList_MVVM_RXSwift" customModuleProvider="target">
             <connections>
-                <outlet property="cartButton" destination="QBY-fc-Dji" id="oum-5V-bgv"/>
+                <outlet property="cartIco" destination="gbB-wi-3pY" id="Z1K-Cu-AX8"/>
                 <outlet property="radiusView" destination="axE-6W-OD8" id="Jjk-Eb-4tZ"/>
             </connections>
         </placeholder>
@@ -22,17 +22,16 @@
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="axE-6W-OD8">
                     <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
                     <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QBY-fc-Dji" userLabel="cartBtn">
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cart" translatesAutoresizingMaskIntoConstraints="NO" id="gbB-wi-3pY">
                             <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
-                            <state key="normal" backgroundImage="cart"/>
-                        </button>
+                        </imageView>
                     </subviews>
                     <color key="backgroundColor" systemColor="linkColor"/>
                     <constraints>
-                        <constraint firstAttribute="trailing" secondItem="QBY-fc-Dji" secondAttribute="trailing" id="3io-IJ-cgL"/>
-                        <constraint firstItem="QBY-fc-Dji" firstAttribute="leading" secondItem="axE-6W-OD8" secondAttribute="leading" id="4nR-0n-uiF"/>
-                        <constraint firstItem="QBY-fc-Dji" firstAttribute="top" secondItem="axE-6W-OD8" secondAttribute="top" id="Gtg-Ro-ujB"/>
-                        <constraint firstAttribute="bottom" secondItem="QBY-fc-Dji" secondAttribute="bottom" id="iyq-uW-5L1"/>
+                        <constraint firstItem="gbB-wi-3pY" firstAttribute="top" secondItem="axE-6W-OD8" secondAttribute="top" id="0tn-1W-Dhb"/>
+                        <constraint firstAttribute="bottom" secondItem="gbB-wi-3pY" secondAttribute="bottom" id="M3L-jr-9xW"/>
+                        <constraint firstAttribute="trailing" secondItem="gbB-wi-3pY" secondAttribute="trailing" id="gS8-Qo-J1p"/>
+                        <constraint firstItem="gbB-wi-3pY" firstAttribute="leading" secondItem="axE-6W-OD8" secondAttribute="leading" id="qUI-ra-U3F"/>
                     </constraints>
                 </view>
             </subviews>

@@ -1,5 +1,6 @@
 
 import UIKit
+import RxSwift
 import RxCocoa
 
 protocol DetailViewModelProtocol {
@@ -13,7 +14,7 @@ protocol DetailViewModelProtocol {
     var categoryList: BehaviorRelay<[Category]> { get }
     var categoryListArr: [Category] { get }
     var selectedAmount: Int { get set }
-    var bindToController: () -> () { get set }
+    var dataReceived: PublishSubject<Bool> { get set }
     func loadProduct()
     func changeCartCount(index: Int, count: Int)
     func cellViewModel(index: Int) -> DetailCellViewModalProtocol?

@@ -7,13 +7,13 @@ class ListViewModel: ListViewModelProtocol {
 
     var productList: BehaviorRelay<[Product]>
     var productListArr = [Product]()
-    var searchText: BehaviorRelay<String>
-    var showLoadIndicator: () -> () = {}
-    var hideLoadIndicator: () -> () = {}
+    var searchText: PublishSubject<String>
+    var showLoadIndicator: PublishSubject<Bool>
     let DBag = DisposeBag()
 
     // Поиск
     private let searchOperationQueue = OperationQueue()
+    var searchString = ""
 
     // Страницы
     var page: Int = 1
@@ -21,9 +21,9 @@ class ListViewModel: ListViewModelProtocol {
 
     init() {
         productList = BehaviorRelay<[Product]>(value: [])
-        searchText = BehaviorRelay<String>(value: "")
+        searchText = PublishSubject<String>()
+        showLoadIndicator = PublishSubject<Bool>()
         setupBindings()
-        loadProducts()
     }
 
     private func setupBindings() {
@@ -31,16 +31,17 @@ class ListViewModel: ListViewModelProtocol {
         // Наблюдаем за изменениями в форме поиска
         searchText
                 .asObservable()
-                .subscribe { [weak self] (search) in
+                .subscribe { [weak self] search in
 
                     // Проверяем измененный в форме текст
                     guard let searchString = search.element else { return }
-
+                    self?.searchString = searchString
+                    
                     // Очищаем старые данные и обновляем таблицу
                     self?.removeAllProducts()
 
                     // Отображаем анимацию загрузки
-                    self?.showLoadIndicator()
+                    self?.showLoadIndicator.onNext(true)
 
                     // Поиск
                     let operationSearch = BlockOperation()
@@ -68,32 +69,35 @@ class ListViewModel: ListViewModelProtocol {
     func loadProducts() {
 
         // Отправляем запрос загрузки товаров
-        ProductNetworking.getProducts(page: page, searchText: searchText.value) { [weak self] (response) in
+        ProductNetworking.getProducts(page: page, searchText: searchString)
+                .subscribe(onNext: { [weak self] data in
 
-            // Обрабатываем полученные товары
-            var products = response.products
+                    // Обрабатываем полученные товары
+                    var products = data ?? []
 
-            // Так как API не позвращает отдельный ключ, который говорит о том, что есть следующая страница, определяем это вручную
-            if !products.isEmpty && products.count == ProductNetworking.maxProductsOnPage {
+                    // Так как API не позвращает отдельный ключ, который говорит о том, что есть следующая страница, определяем это вручную
+                    if !products.isEmpty && products.count == ProductNetworking.maxProductsOnPage {
 
-                // Задаем наличие следующей страницы
-                self?.haveNextPage = true
+                        // Задаем наличие следующей страницы
+                        self?.haveNextPage = true
 
-                // Удаляем последний элемент, который используется только для проверки на наличие следующей страницы
-                products.remove(at: products.count - 1)
+                        // Удаляем последний элемент, который используется только для проверки на наличие следующей страницы
+                        products.remove(at: products.count - 1)
 
-            }
+                    }
 
-            // Устанавливаем загруженные товары и обновляем таблицу
-            // append contentsOf так как у нас метод грузит как первую страницу, так и последующие
-            self?.appendProducts(products: products)
+                    // Устанавливаем загруженные товары и обновляем таблицу
+                    // append contentsOf так как у нас метод грузит как первую страницу, так и последующие
+                    self?.appendProducts(products: products)
 
-            // Обновляем данные в контроллере
-            if self?.page == 1 {
-                self?.hideLoadIndicator()
-            }
+                    // Обновляем данные в контроллере
+                    if self?.page == 1 {
+                        self?.showLoadIndicator.onNext(false)
+                    }
 
-        }
+                }, onError: { [weak self] error in
+                    print(error)
+                }).disposed(by: DBag)
 
     }
 
