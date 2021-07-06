@@ -43,7 +43,7 @@ class ProductNetworking {
 
             if let url = urlWithParams.url {
 
-                // Получаем список
+                // Отправляем запрос
                 Networking.network.getData(url: url)
                         .subscribe(onNext: { data in
 
@@ -78,7 +78,7 @@ class ProductNetworking {
 
             if let url = urlWithParams.url {
 
-                // Получаем список
+                // Отправляем запрос
                 Networking.network.getData(url: url)
                         .subscribe(onNext: { data in
 
