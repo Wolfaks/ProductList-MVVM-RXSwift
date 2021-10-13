@@ -44,7 +44,7 @@ class ProductNetworking {
             if let url = urlWithParams.url {
 
                 // Отправляем запрос
-                Networking.network.getData(url: url)
+                Networking.shared.getData(url: url)
                         .subscribe(onNext: { data in
 
                             do {
@@ -79,7 +79,7 @@ class ProductNetworking {
             if let url = urlWithParams.url {
 
                 // Отправляем запрос
-                Networking.network.getData(url: url)
+                Networking.shared.getData(url: url)
                         .subscribe(onNext: { data in
 
                             do {

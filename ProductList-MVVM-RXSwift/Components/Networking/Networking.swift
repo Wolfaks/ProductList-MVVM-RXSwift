@@ -13,7 +13,7 @@ class Networking {
     // Создаем синглтон для обращения к методам класса
     private init() {
     }
-    static let network = Networking()
+    static let shared = Networking()
 
     public func getData(url: URL) -> Observable<Any> {
 

@@ -56,7 +56,7 @@ class DetailViewModel: DetailViewModelProtocol {
                         // Загрузка изображения
                         if let imageURL = URL(string: (self?.imageUrl as? String) ?? "") {
 
-                            ImageNetworking.networking.getImage(link: imageURL) { (img) in
+                            ImageNetworking.shared.getImage(link: imageURL) { (img) in
                                 DispatchQueue.global(qos: .userInitiated).sync {
                                     self?.image = img
                                 }
