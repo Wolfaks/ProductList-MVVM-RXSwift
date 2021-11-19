@@ -12,6 +12,8 @@ class ProductListTableCell: UITableViewCell {
     @IBOutlet weak var productProducer: UILabel!
     @IBOutlet weak var productPrice: UILabel!
     @IBOutlet weak var stackFooterCell: UIStackView!
+    
+    weak var listViewModel: ListViewModelProtocol?
 
     let DBag = DisposeBag()
     
@@ -84,9 +86,7 @@ class ProductListTableCell: UITableViewCell {
                     
                     // Добавляем товар в карзину
                     guard let productIndex = self?.productIndex else { return }
-
-                    // Обновляем значение в корзине в списке через наблюдатель
-                    NotificationCenter.default.post(name: Notification.Name(rawValue: "notificationUpdateCartCount"), object: nil, userInfo: ["index": productIndex, "count": 1])
+                    self?.updateCartCountList(index: productIndex, value: 1)
                     
                 }.disposed(by: DBag)
         
@@ -95,9 +95,7 @@ class ProductListTableCell: UITableViewCell {
             
             // Изменяем значение количества в структуре
             guard let productIndex = self?.productIndex else { return }
-
-            // Обновляем значение в корзине в списке через наблюдатель
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "notificationUpdateCartCount"), object: nil, userInfo: ["index": productIndex, "count": value])
+            self?.updateCartCountList(index: productIndex, value: value)
             
         }, onError: { [weak self] error in
             print(error)
@@ -105,7 +103,14 @@ class ProductListTableCell: UITableViewCell {
         
     }
     
-    func setBorder() {
+    private func updateCartCountList(index: Int, value: Int) {
+        if let productList = listViewModel?.output.productListArr, !productList.indices.contains(index) { return }
+        
+        let cardCountUpdate = CardCountUpdate(index: index, value: value)
+        listViewModel?.updateCartCount(cardCountUpdate: cardCountUpdate)
+    }
+    
+    private func setBorder() {
         
         // Устанавливаем обводку
         borderView.layer.cornerRadius = 10.0
@@ -114,7 +119,7 @@ class ProductListTableCell: UITableViewCell {
         
     }
     
-    func setCartButtons(viewModel: ListCellViewModalProtocol) {
+    private func setCartButtons(viewModel: ListCellViewModalProtocol) {
 
         // Вывод корзины и кол-ва добавленых в корзину
         if viewModel.selectedAmount > 0 {
@@ -154,13 +159,11 @@ class ProductListTableCell: UITableViewCell {
         
         // Выполняем переход в детальную информацию
         guard let productIndex = productIndex else { return }
-
-        // Уведомляем наблюдатель о переходе в детальную информацию
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "notificationRedirectToDetail"), object: nil, userInfo: ["index": productIndex])
+        listViewModel?.output.selectProductIndex.onNext(productIndex)
         
     }
     
-    func setClicable() {
+    private func setClicable() {
         
         // Клик на изображение для перехода в детальную информацию
         let tapImageGesture = UITapGestureRecognizer(target: self, action: #selector(detailTapped))

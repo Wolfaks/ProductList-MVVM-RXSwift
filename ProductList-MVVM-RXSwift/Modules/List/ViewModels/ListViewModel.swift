@@ -3,26 +3,31 @@ import UIKit
 import RxSwift
 import RxCocoa
 
+protocol ListViewModelProtocol: class {
+    var input: InputListView { get }
+    var output: OutputListView { get }
+    var searchText: PublishSubject<String> { get }
+    func visibleCell(Index: Int)
+    func updateCartCount(cardCountUpdate: CardCountUpdate)
+    func cellViewModel(product: Product) -> ListCellViewModalProtocol?
+}
+
 class ListViewModel: ListViewModelProtocol {
 
-    var productList: BehaviorRelay<[Product]>
-    var productListArr = [Product]()
     var searchText: PublishSubject<String>
-    var showLoadIndicator: PublishSubject<Bool>
     let DBag = DisposeBag()
 
     // Поиск
     private let searchOperationQueue = OperationQueue()
-    var searchString = ""
-
-    // Страницы
-    var page: Int = 1
-    var haveNextPage: Bool = false
+    
+    let input: InputListView
+    let output: OutputListView
 
     init() {
-        productList = BehaviorRelay<[Product]>(value: [])
+        input = InputListView()
+        output = OutputListView()
+        
         searchText = PublishSubject<String>()
-        showLoadIndicator = PublishSubject<Bool>()
         setupBindings()
     }
 
@@ -35,13 +40,13 @@ class ListViewModel: ListViewModelProtocol {
 
                     // Проверяем измененный в форме текст
                     guard let searchString = search.element else { return }
-                    self?.searchString = searchString
+                    self?.input.searchText = searchString
                     
                     // Очищаем старые данные и обновляем таблицу
                     self?.removeAllProducts()
 
                     // Отображаем анимацию загрузки
-                    self?.showLoadIndicator.onNext(true)
+                    self?.output.showLoadIndicator.onNext(true)
 
                     // Поиск
                     let operationSearch = BlockOperation()
@@ -51,7 +56,7 @@ class ListViewModel: ListViewModelProtocol {
 
                             // Выполняем поиск
                             // Задаем первую страницу
-                            self?.page = 1
+                            self?.input.page = 1
 
                             // Запрос данных
                             self?.loadProducts()
@@ -69,17 +74,16 @@ class ListViewModel: ListViewModelProtocol {
     func loadProducts() {
 
         // Отправляем запрос загрузки товаров
-        ProductNetworking.getProducts(page: page, searchText: searchString)
-                .subscribe(onNext: { [weak self] data in
+        ProductListService.getProducts(page: self.input.page, searchText: self.input.searchText)
+                .subscribe(onNext: { [weak self] productsRaw in
 
-                    // Обрабатываем полученные товары
-                    var products = data ?? []
-
+                    var products = productsRaw
+                    
                     // Так как API не позвращает отдельный ключ, который говорит о том, что есть следующая страница, определяем это вручную
-                    if !products.isEmpty && products.count == ProductNetworking.maxProductsOnPage {
+                    if !products.isEmpty && products.count == Constants.Settings.maxProductsOnPage {
 
                         // Задаем наличие следующей страницы
-                        self?.haveNextPage = true
+                        self?.input.haveNextPage = true
 
                         // Удаляем последний элемент, который используется только для проверки на наличие следующей страницы
                         products.remove(at: products.count - 1)
@@ -91,11 +95,11 @@ class ListViewModel: ListViewModelProtocol {
                     self?.appendProducts(products: products)
 
                     // Обновляем данные в контроллере
-                    if self?.page == 1 {
-                        self?.showLoadIndicator.onNext(false)
+                    if self?.input.page == 1 {
+                        self?.output.showLoadIndicator.onNext(false)
                     }
 
-                }, onError: { [weak self] error in
+                }, onError: { error in
                     print(error)
                 }).disposed(by: DBag)
 
@@ -104,11 +108,11 @@ class ListViewModel: ListViewModelProtocol {
     func visibleCell(Index: Int) {
 
         // Проверяем что оторазили последний элемент и если есть, отображаем следующую страницу
-        if !productListArr.isEmpty && (productListArr.count - 1) == Index, haveNextPage {
+        if !output.productListArr.isEmpty && (output.productListArr.count - 1) == Index, self.input.haveNextPage {
 
             // Задаем новую страницу
-            haveNextPage = false
-            page += 1
+            self.input.haveNextPage = false
+            self.input.page += 1
 
             // Запрос данных
             loadProducts()
@@ -117,23 +121,23 @@ class ListViewModel: ListViewModelProtocol {
 
     }
 
-    func removeAllProducts() {
-        productListArr.removeAll()
-        productList.accept(productListArr)
+    private func removeAllProducts() {
+        output.productListArr.removeAll()
+        output.productList.accept(output.productListArr)
     }
 
-    func updateProducts() {
-        productList.accept(productListArr)
+    private func updateProducts() {
+        output.productList.accept(output.productListArr)
     }
 
-    func appendProducts(products: [Product]) {
-        productListArr.append(contentsOf: products)
-        productList.accept(productListArr)
+    private func appendProducts(products: [Product]) {
+        output.productListArr.append(contentsOf: products)
+        output.productList.accept(output.productListArr)
     }
 
-    func updateCartCount(index: Int, value: Int) {
-        guard !productListArr.isEmpty && productListArr.indices.contains(index) else { return }
-        productListArr[index].selectedAmount = value
+    func updateCartCount(cardCountUpdate: CardCountUpdate) {
+        guard !output.productListArr.isEmpty && output.productListArr.indices.contains(cardCountUpdate.index) else { return }
+        output.productListArr[cardCountUpdate.index].selectedAmount = cardCountUpdate.value
         updateProducts()
     }
 
@@ -141,4 +145,18 @@ class ListViewModel: ListViewModelProtocol {
         ListCellViewModel(product: product)
     }
 
+}
+
+class InputListView {
+    var searchText: String = ""
+    var page: Int = 1
+    var haveNextPage: Bool = false
+}
+
+class OutputListView {
+    var productListArr = [Product]()
+    var productList = BehaviorRelay<[Product]>(value: [])
+    var showLoadIndicator = PublishSubject<Bool>()
+    var reload: Bool?
+    var selectProductIndex = PublishSubject<Int>()
 }

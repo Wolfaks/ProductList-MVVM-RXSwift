@@ -13,6 +13,8 @@ class ListViewController: UIViewController {
     var viewModel: ListViewModelProtocol!
     let DBag = DisposeBag()
     
+    weak var detailViewController: DetailViewControllerProtocol?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         settingUI()
@@ -21,20 +23,10 @@ class ListViewController: UIViewController {
     
     private func settingUI() {
 
-        // Наблюдатель изменения товаров в корзине
-        NotificationCenter.default.addObserver(self, selector: #selector(updateCartCount), name: Notification.Name(rawValue: "notificationUpdateCartCount"), object: nil)
-
-        // Наблюдатель перехода в детальную информацию
-        NotificationCenter.default.addObserver(self, selector: #selector(showDetail), name: Notification.Name(rawValue: "notificationRedirectToDetail"), object: nil)
-
         // viewModel
         viewModel = ListViewModel()
 
-        // tableView
-        tableView.rowHeight = 160.0
-
-        // search
-        // Кнопка done
+        // searchForm
         searchForm.delegate = self
         
     }
@@ -48,23 +40,25 @@ class ListViewController: UIViewController {
 
         // Связываем TextField с поисков в ListViewModel
         searchForm.rx.text
-                .orEmpty
-                .throttle(.milliseconds(1000), scheduler: MainScheduler.instance)
-                .distinctUntilChanged()
-                .do(onNext: nil)
-                .bind(to: viewModel.searchText).disposed(by: DBag)
+            .orEmpty
+            .throttle(.milliseconds(1000), scheduler: MainScheduler.instance)
+            .distinctUntilChanged()
+            .do(onNext: nil)
+            .bind(to: viewModel.searchText)
+            .disposed(by: DBag)
 
     }
 
     private func bindViewModelToView() {
 
         // Вывод данных
-        viewModel.productList.bind(to: tableView.rx.items(cellIdentifier: "productCell", cellType: ProductListTableCell.self)) {
+        viewModel.output.productList.bind(to: tableView.rx.items(cellIdentifier: "productCell", cellType: ProductListTableCell.self)) {
             (row, item, cell) in
 
             let cellViewModel = self.viewModel.cellViewModel(product: item)
             cell.productIndex = row
             cell.viewModel = cellViewModel
+            cell.listViewModel = self.viewModel
 
         }.disposed(by: DBag)
 
@@ -81,7 +75,7 @@ class ListViewController: UIViewController {
                 }.disposed(by: DBag)
 
         // Анимация загрузки
-        viewModel.showLoadIndicator.subscribe(onNext: { [weak self] show in
+        viewModel.output.showLoadIndicator.subscribe(onNext: { [weak self] show in
 
             if show {
                 // Отображаем анимацию загрузки
@@ -94,46 +88,61 @@ class ListViewController: UIViewController {
         }, onError: { [weak self] error in
             print(error)
         }).disposed(by: DBag)
+        
+        viewModel?.output.selectProductIndex.subscribe(onNext: { [weak self] index in
+            self?.redirectToDetail(index: index)
+        }, onError: { [weak self] error in
+            print(error)
+        }).disposed(by: DBag)
 
     }
+    
+    private func bindDetailUpdateCard() {
+        self.detailViewController?.cardCountUpdateSubject.subscribe(onNext: { [weak self] cardCountUpdate in
 
-    @objc func updateCartCount(notification: Notification) {
+            // Вывод корзины и кол-ва добавленых в корзину
+            self?.updateCartCount(cardCountUpdate: cardCountUpdate)
 
-        // Изменяем кол-во товара в корзине
-        guard let userInfo = notification.userInfo, let index = userInfo["index"] as? Int, let newCount = userInfo["count"] as? Int, let viewModel = viewModel else { return }
-
-        // Записываем новое значение
-        viewModel.updateCartCount(index: index, value: newCount)
-
+        }, onError: { [weak self] error in
+            print(error)
+        }).disposed(by: DBag)
     }
-
-    @objc func showDetail(notification: Notification) {
-
-        // Переход в детальную информацию
-        guard let userInfo = notification.userInfo, let index = userInfo["index"] as? Int, let viewModel = viewModel, !viewModel.productListArr.isEmpty && viewModel.productListArr.indices.contains(index) else { return }
-
+    
+    private func redirectToDetail(index: Int) {
+        
         // Выполняем переход в детальную информацию
-        if let detailViewController = DetailViewController.storyboardInstance() {
-            detailViewController.productIndex = index
-            detailViewController.productID = viewModel.productListArr[index].id
-            detailViewController.productTitle = viewModel.productListArr[index].title
-            detailViewController.productSelectedAmount = viewModel.productListArr[index].selectedAmount
+        if !viewModel.output.productListArr.indices.contains(index) { return }
+        
+        // Выполняем переход в детальную информацию
+        detailViewController = DetailViewController.storyboardInstance()
+        if let detailViewController = detailViewController as? UIViewController {
+            self.detailViewController?.setProductData(productIndex: index,
+                                                      productID: viewModel.output.productListArr[index].id,
+                                                      productTitle: viewModel.output.productListArr[index].title,
+                                                      productSelectedAmount: viewModel.output.productListArr[index].selectedAmount)
+            
+            bindDetailUpdateCard()
+            
             navigationController?.pushViewController(detailViewController, animated: true)
         }
-
+        
     }
     
     @IBAction func removeSearch(_ sender: Any) {
         
         // Очищаем форму поиска
         searchForm.text = ""
-
+        
         // Скрываем клавиатуру
         hideKeyboard()
         
     }
     
-    func hideKeyboard() {
+    private func updateCartCount(cardCountUpdate: CardCountUpdate) {
+        viewModel.updateCartCount(cardCountUpdate: cardCountUpdate)
+    }
+    
+    private func hideKeyboard() {
         view.endEditing(true)
     }
     

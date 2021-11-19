@@ -3,71 +3,71 @@ import UIKit
 import RxSwift
 import RxCocoa
 
+protocol DetailViewModelProtocol {
+    var input: InputDetailView { get }
+    var output: OutputDetailView { get }
+    func changeCartCount(cardCountUpdate: CardCountUpdate)
+    func cellViewModel(index: Int) -> DetailCellViewModalProtocol?
+}
+
 class DetailViewModel: DetailViewModelProtocol {
+    
+    let input: InputDetailView
+    let output: OutputDetailView
 
-    let id: Int
-
-    var title: String = ""
-    var producer: String = ""
-    var shortDescription: String = ""
-    var imageUrl: String = ""
-    var image: UIImage
-    var price: String = ""
-    var categoryList: BehaviorRelay<[Category]>
-    var categoryListArr = [Category]()
-    var selectedAmount: Int = 0
-
-    var dataReceived: PublishSubject<Bool>
     let DBag = DisposeBag()
 
-    init(productID: Int, amount: Int) {
-        id = productID
-        selectedAmount = amount
-        image = UIImage(named: "nophoto")!
-        categoryList = BehaviorRelay<[Category]>(value: [])
-        dataReceived = PublishSubject<Bool>()
-        loadProduct()
+    init() {
+        input = InputDetailView()
+        output = OutputDetailView()
+        
+        setupBindings()
+    }
+    
+    private func setupBindings() {
+        input.id.subscribe(onNext: { [weak self] id in
+            guard let id = id else { return }
+            self?.loadProduct(id: id)
+        }, onError: { [weak self] error in
+            print(error)
+        }).disposed(by: DBag)
     }
 
-    func loadProduct() {
+    func loadProduct(id: Int) {
+        output.image = UIImage(named: "nophoto")!
 
         // Отправляем запрос загрузки товара
-        ProductNetworking.getOneProduct(id: id)
-                .subscribe(onNext: { [weak self] data in
+        ProductDetailService.getOneProduct(id: id)
+                .subscribe(onNext: { [weak self] product in
 
-                    // Проверяем что данные были успешно обработаны
-                    guard let product = data else { return }
-
-                    self?.title = product.title
-                    self?.producer = product.producer
-                    self?.shortDescription = product.shortDescription
-                    self?.imageUrl = product.imageUrl
-
-                    // Убираем лишние нули после запятой, если они есть и выводим цену
-                    self?.price = String(format: "%g", product.price) + " ₽"
-
-                    // categories
-                    self?.categoryListArr = product.categories
-                    self?.categoryList.accept(product.categories)
-
+                    guard let product = product else { return }
+                    
                     // Загрузка изображения, если ссылка пуста, то выводится изображение по умолчанию
-                    if !(self?.imageUrl.isEmpty ?? false) {
+                    if !(product.imageUrl.isEmpty) {
 
                         // Загрузка изображения
-                        if let imageURL = URL(string: (self?.imageUrl as? String) ?? "") {
+                        if let imageURL = URL(string: product.imageUrl) {
 
                             ImageNetworking.shared.getImage(link: imageURL) { (img) in
                                 DispatchQueue.global(qos: .userInitiated).sync {
-                                    self?.image = img
+                                    self?.output.image = img
                                 }
                             }
 
                         }
 
                     }
+                    
+                    // Categories
+                    if let categories = product.categories {
+                        self?.output.categoryListArr = categories
+                        self?.output.categoryList.accept(categories)
+                    }
 
                     // Обновляем данные в контроллере
-                    self?.dataReceived.onNext(true)
+                    self?.output.product = product
+                    self?.output.product?.selectedAmount = self?.input.selectedAmount ?? 0
+                    self?.output.loaded.onNext(true)
 
                 }, onError: { [weak self] error in
                     print(error)
@@ -76,17 +76,31 @@ class DetailViewModel: DetailViewModelProtocol {
     }
 
     func cellViewModel(index: Int) -> DetailCellViewModalProtocol? {
-        let category = categoryListArr[index]
+        let category = output.categoryListArr[index]
         return DetailCellViewModel(category: category)
     }
 
-    func changeCartCount(index: Int, count: Int) {
+    func changeCartCount(cardCountUpdate: CardCountUpdate) {
 
         // Обновляем значение
-        selectedAmount = count
-
-        // Обновляем значение в корзине в списке через наблюдатель
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "notificationUpdateCartCount"), object: nil, userInfo: ["index": index, "count": count])
+        output.product?.selectedAmount = cardCountUpdate.value
+        
+        let cardCountUpdate = CardCountUpdate(index: cardCountUpdate.index, value: cardCountUpdate.value)
+        output.cardCountUpdateSubject.onNext(cardCountUpdate)
 
     }
+}
+
+class InputDetailView {
+    var id = BehaviorRelay<Int?>(value: nil)
+    var selectedAmount: Int?
+}
+
+class OutputDetailView {
+    var product: Product?
+    var categoryList = BehaviorRelay<[Category]>(value: [])
+    var categoryListArr = [Category]()
+    var image: UIImage?
+    var loaded = PublishSubject<Bool>()
+    var cardCountUpdateSubject = PublishSubject<CardCountUpdate>()
 }

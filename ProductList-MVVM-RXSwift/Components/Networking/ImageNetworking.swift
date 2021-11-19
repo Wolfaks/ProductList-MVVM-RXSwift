@@ -4,8 +4,7 @@ import UIKit
 class ImageNetworking {
     
     // Создаем синглтон для обращения к методам класса
-    private init() {
-    }
+    private init() {}
     static let shared = ImageNetworking()
     
     // Кеш изображений
@@ -31,11 +30,7 @@ class ImageNetworking {
                 
                 // Сохраняем в кеш
                 self.cacheImage.setObject(img, forKey: link.absoluteString as NSString)
-                
-                // Выводим
-                DispatchQueue.main.async {
-                    complition(img)
-                }
+                complition(img)
                 
             }
 

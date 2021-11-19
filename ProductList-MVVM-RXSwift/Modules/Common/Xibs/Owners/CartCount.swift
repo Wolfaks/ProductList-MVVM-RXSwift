@@ -43,7 +43,7 @@ import RxSwift
         
     }
     
-    func setupView() {
+    private func setupView() {
         let view = loadFromNib()
         view.frame = bounds
         view.autoresizingMask = [

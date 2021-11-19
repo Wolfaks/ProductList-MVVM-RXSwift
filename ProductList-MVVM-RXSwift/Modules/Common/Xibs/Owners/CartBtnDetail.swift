@@ -1,16 +1,12 @@
 
 import UIKit
 
-@IBDesignable class CartBtnList: UIView {
-
-    static let widthSize: CGFloat = 28.0
-    static let heightSize: CGFloat = 28.0
-
+@IBDesignable class CartBtnDetail: UIView {
+    
     @IBOutlet weak var radiusView: UIView!
-    @IBOutlet weak var cartIco: UIImageView!
     
     var view: UIView!
-    var nibName: String = "CartBtnList"
+    var nibName: String = "CartBtnDetail"
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -31,7 +27,7 @@ import UIKit
         
     }
     
-    func setupView() {
+    private func setupView() {
         
         let view = loadFromNib()
         view.frame = bounds
