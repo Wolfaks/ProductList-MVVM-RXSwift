@@ -32,7 +32,7 @@ class DetailViewController: UIViewController, DetailViewControllerProtocol {
     // viewModel
     var viewModel: DetailViewModelProtocol?
 
-    let DBag = DisposeBag()
+    private let DBag = DisposeBag()
 
     static func storyboardInstance() -> DetailViewController? {
         // Для перехода на эту страницу
@@ -109,7 +109,7 @@ class DetailViewController: UIViewController, DetailViewControllerProtocol {
             // Отображаем данные
             self?.infoStackView.isHidden = false
 
-        }, onError: { [weak self] error in
+        }, onError: { error in
             print(error)
         }).disposed(by: DBag)
         
@@ -120,7 +120,7 @@ class DetailViewController: UIViewController, DetailViewControllerProtocol {
             self?.updateCartCount(cardCountUpdate: cardCountUpdate)
             self?.setCartButtons()
 
-        }, onError: { [weak self] error in
+        }, onError: { error in
             print(error)
         }).disposed(by: DBag)
 
@@ -161,7 +161,7 @@ class DetailViewController: UIViewController, DetailViewControllerProtocol {
             let cardCountUpdate = CardCountUpdate(index: productIndex, value: value)
             self?.viewModel?.changeCartCount(cardCountUpdate: cardCountUpdate)
             
-        }, onError: { [weak self] error in
+        }, onError: { error in
             print(error)
         }).disposed(by: DBag)
 

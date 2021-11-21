@@ -18,7 +18,7 @@ class Networking {
 
         // Выполняем запрос по URL
         return session.rx.data(request: urlRequest)
-                .observeOn(MainScheduler.asyncInstance)
+                .observe(on: MainScheduler.asyncInstance)
     }
 
 }

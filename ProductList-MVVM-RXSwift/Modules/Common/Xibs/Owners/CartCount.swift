@@ -22,7 +22,7 @@ import RxSwift
     var view: UIView!
     var nibName: String = "CartCount"
     
-    let DBag = DisposeBag()
+    private let DBag = DisposeBag()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -80,7 +80,7 @@ import RxSwift
         // Изменение количества в корзине
         countSubject.subscribe(onNext: { [weak self] count in
             self?.count = count
-        }, onError: { [weak self] error in
+        }, onError: { error in
             print(error)
         }).disposed(by: DBag)
         

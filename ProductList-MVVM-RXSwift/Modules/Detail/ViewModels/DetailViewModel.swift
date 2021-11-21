@@ -15,7 +15,7 @@ class DetailViewModel: DetailViewModelProtocol {
     let input: InputDetailView
     let output: OutputDetailView
 
-    let DBag = DisposeBag()
+    private let DBag = DisposeBag()
 
     init() {
         input = InputDetailView()
@@ -28,7 +28,7 @@ class DetailViewModel: DetailViewModelProtocol {
         input.id.subscribe(onNext: { [weak self] id in
             guard let id = id else { return }
             self?.loadProduct(id: id)
-        }, onError: { [weak self] error in
+        }, onError: { error in
             print(error)
         }).disposed(by: DBag)
     }
@@ -69,7 +69,7 @@ class DetailViewModel: DetailViewModelProtocol {
                     self?.output.product?.selectedAmount = self?.input.selectedAmount ?? 0
                     self?.output.loaded.onNext(true)
 
-                }, onError: { [weak self] error in
+                }, onError: { error in
                     print(error)
                 }).disposed(by: DBag)
 

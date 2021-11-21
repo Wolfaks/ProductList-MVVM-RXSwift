@@ -15,7 +15,7 @@ class ProductListTableCell: UITableViewCell {
     
     weak var listViewModel: ListViewModelProtocol?
 
-    let DBag = DisposeBag()
+    private let DBag = DisposeBag()
     
     lazy var cartBtnListView: CartBtnList = {
         let btnList = CartBtnList()
@@ -97,14 +97,15 @@ class ProductListTableCell: UITableViewCell {
             guard let productIndex = self?.productIndex else { return }
             self?.updateCartCountList(index: productIndex, value: value)
             
-        }, onError: { [weak self] error in
+        }, onError: { error in
             print(error)
         }).disposed(by: DBag)
         
     }
     
     private func updateCartCountList(index: Int, value: Int) {
-        if let productList = listViewModel?.output.productListArr, !productList.indices.contains(index) { return }
+        
+        if let productList = listViewModel?.output.productList.value, !productList.indices.contains(index) { return }
         
         let cardCountUpdate = CardCountUpdate(index: index, value: value)
         listViewModel?.updateCartCount(cardCountUpdate: cardCountUpdate)

@@ -11,7 +11,7 @@ class ListViewController: UIViewController {
 
     // viewModel
     var viewModel: ListViewModelProtocol!
-    let DBag = DisposeBag()
+    private let DBag = DisposeBag()
     
     weak var detailViewController: DetailViewControllerProtocol?
     
@@ -44,7 +44,7 @@ class ListViewController: UIViewController {
             .throttle(.milliseconds(1000), scheduler: MainScheduler.instance)
             .distinctUntilChanged()
             .do(onNext: nil)
-            .bind(to: viewModel.searchText)
+                .bind(to: viewModel.input.searchSubject)
             .disposed(by: DBag)
 
     }
@@ -70,7 +70,7 @@ class ListViewController: UIViewController {
 
                     // Проверяем что оторазили последний элемент и если есть, отображаем следующую страницу
                     guard self?.viewModel != nil else { return }
-                    self?.viewModel.visibleCell(Index: indexPath.row)
+                    self?.viewModel.visibleCell(index: indexPath.row)
 
                 }.disposed(by: DBag)
 
@@ -85,13 +85,13 @@ class ListViewController: UIViewController {
                 self?.loadIndicator.stopAnimating()
             }
 
-        }, onError: { [weak self] error in
+        }, onError: { error in
             print(error)
         }).disposed(by: DBag)
         
         viewModel?.output.selectProductIndex.subscribe(onNext: { [weak self] index in
             self?.redirectToDetail(index: index)
-        }, onError: { [weak self] error in
+        }, onError: { error in
             print(error)
         }).disposed(by: DBag)
 
@@ -103,7 +103,7 @@ class ListViewController: UIViewController {
             // Вывод корзины и кол-ва добавленых в корзину
             self?.updateCartCount(cardCountUpdate: cardCountUpdate)
 
-        }, onError: { [weak self] error in
+        }, onError: { error in
             print(error)
         }).disposed(by: DBag)
     }
@@ -111,15 +111,16 @@ class ListViewController: UIViewController {
     private func redirectToDetail(index: Int) {
         
         // Выполняем переход в детальную информацию
-        if !viewModel.output.productListArr.indices.contains(index) { return }
+        let productList = viewModel.output.productList.value
+        if !productList.indices.contains(index) { return }
         
         // Выполняем переход в детальную информацию
         detailViewController = DetailViewController.storyboardInstance()
         if let detailViewController = detailViewController as? UIViewController {
             self.detailViewController?.setProductData(productIndex: index,
-                                                      productID: viewModel.output.productListArr[index].id,
-                                                      productTitle: viewModel.output.productListArr[index].title,
-                                                      productSelectedAmount: viewModel.output.productListArr[index].selectedAmount)
+                                                      productID: productList[index].id,
+                                                      productTitle: productList[index].title,
+                                                      productSelectedAmount: productList[index].selectedAmount)
             
             bindDetailUpdateCard()
             
